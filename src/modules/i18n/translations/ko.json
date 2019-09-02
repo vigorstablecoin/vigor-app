@@ -1,0 +1,7 @@
+{
+  "ledgerConnecting": "Connecting to Ledger ...",
+  "ledgerInfo": "Make sure you have the latest EOS app installed, your ledger is unlocked and the EOS app is open.",
+  "loggingIn": "Logging In",
+  "logIn": "로그인",
+  "logOut": "Log Out"
+}
