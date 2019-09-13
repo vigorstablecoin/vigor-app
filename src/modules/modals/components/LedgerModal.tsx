@@ -55,7 +55,7 @@ const ListItem = styled.li`
     }
 
     &:hover {
-        color: ${colors.blue};
+        color: ${colors.primary};
     }
 `;
 

@@ -1,7 +1,6 @@
 import I18nProvider from 'modules/i18n/components/I18nProvider';
 import ModalsContainer from 'modules/modals/components/ModalsContainer';
 import React, { useEffect } from 'react';
-import pageBg from 'shared/assets/vigor/background-logo-alpha-white.svg';
 import { useStore } from 'shared/hooks';
 import colors from 'shared/styles/colors';
 import GlobalStyles from 'shared/styles/global';
@@ -9,6 +8,8 @@ import styled from 'styled-components';
 import { rootStore, storeContext } from '../store';
 import Footer from './Footer';
 import NavBar from './NavBar';
+import Hero from './Hero';
+import Interaction from './Interaction';
 
 const PageWrapper = styled.div`
     position: relative;
@@ -20,19 +21,7 @@ const PageWrapper = styled.div`
     height: 100%;
     min-height: 100vh;
     z-index: 1;
-
-    ::before {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        content: '';
-        z-index: -1;
-        background: ${colors.bg} url(${pageBg}) no-repeat top center;
-        background-size: auto 80%;
-        background-position: 50% 60%;
-    }
+    background-color: ${colors.bg};
 `;
 
 export const StoreProvider = ({ children }) => {
@@ -52,7 +41,8 @@ const App: React.FC = () => {
                 <GlobalStyles />
                 <PageWrapper>
                     <NavBar />
-                    {/* <Content /> */}
+                    <Hero />
+                    <Interaction />
                     <ModalsContainer />
                     <Footer />
                 </PageWrapper>
