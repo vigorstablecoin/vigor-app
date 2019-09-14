@@ -1,0 +1,6 @@
+[build]
+  command = "yarn build"
+  publish = "build"
+
+[context.production.environment]
+  REACT_APP_SOME_VAR = "From netlify.toml (REACT_APP_)"
