@@ -83,6 +83,9 @@ export default class AccountStore {
                     this.isLoggingIn = false;
                     return this.login(walletName);
                 } catch {}
+            } else {
+                // throw error to frontend
+                throw err;
             }
         } finally {
             this.isLoggingIn = false;

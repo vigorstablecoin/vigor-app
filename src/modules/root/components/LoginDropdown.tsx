@@ -52,7 +52,7 @@ const userOptions = [
 
 const LoginButton = styled.button`
     font-weight: bold;
-    color: ${colors.blue};
+    color: ${colors.white};
 `;
 
 const UserButton = styled.button`
@@ -114,7 +114,12 @@ const LoginDropdown: React.FC<Props> = () => {
     const accountStore = useStore(rootStore => rootStore.accountStore);
 
     const handleLogin = async value => {
-        await accountStore.login(value);
+        try {
+            await accountStore.login(value);
+        } catch (err) {
+            // TODO: show Toast
+            console.log(`TODO: show toast with error`, err.message)
+        }
     };
     const handleUserMenuClick = async value => {
         if (value === `logout`) {
