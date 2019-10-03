@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import colors from 'shared/styles/colors';
 import pageBg from 'shared/assets/vigor/background-logo-alpha-white.svg';
 import { Section } from 'shared/components/styled';
+import Stats from 'modules/vigor/components/Stats';
 
 const InteractionWrapper = styled(Section)`
     position: relative;
@@ -11,7 +12,8 @@ const InteractionWrapper = styled(Section)`
     flex-direction: column;
     justify-content: space-around;
     align-items: center;
-    height: 500px;
+    min-height: 500px;
+    margin: 0 0 120px 0;
 
     ::before {
         position: absolute;
@@ -28,7 +30,9 @@ const InteractionWrapper = styled(Section)`
 `;
 
 const Interaction = () => {
-    return <InteractionWrapper></InteractionWrapper>;
+    return <InteractionWrapper>
+        <Stats />
+    </InteractionWrapper>;
 };
 
 export default Interaction;
