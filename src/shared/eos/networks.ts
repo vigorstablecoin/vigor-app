@@ -1,4 +1,4 @@
-import { IEOSNetwork } from '../typings';
+import { IEOSNetwork, NetworkName, isNetworkName, exhaustiveCheck } from '../typings';
 import { JsonRpc } from 'eosjs';
 import { getNetworkNameFromStorage } from 'shared/local-storage';
 
@@ -36,23 +36,46 @@ const MainNetwork: IEOSNetwork = createNetwork(
     `aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906`,
 );
 
-function getNetwork() {
-    const eosNetwork = getNetworkNameFromStorage();
+const getNetworkName = (): NetworkName => {
+    const storedNetworkName = getNetworkNameFromStorage()
+    const networkName = storedNetworkName || `jungle` // default to jungle for now
+    if (!isNetworkName(networkName)) throw new Error(`Unknown network ${networkName}`)
+    return networkName
+}
 
-    switch (eosNetwork) {
+const getNetwork = (): IEOSNetwork => {
+    const networkName = getNetworkName()
+
+    switch (networkName) {
         case `jungle`:
             return JungleNetwork;
         case `kylin`:
             return KylinNetwork;
         case `mainnet`:
             return MainNetwork;
-        default:
-            return MainNetwork;
     }
+
+    exhaustiveCheck(networkName)
+}
+
+const getContracts = () => {
+    const networkName = getNetworkName()
+    switch (networkName) {
+        case `jungle`:
+        case `kylin`:
+        case `mainnet`:
+            return {
+                vigor: `vigortester1`,
+                airburn: `vigairburn14`,
+                systemToken: `eosio.token`
+            }
+    }
+
+    exhaustiveCheck(networkName)
 }
 
 const network = getNetwork();
 
 const rpc = new JsonRpc(network.nodeEndpoint);
 
-export { getNetwork, rpc };
+export { getNetwork, getContracts, rpc };
