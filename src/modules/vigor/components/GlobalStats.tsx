@@ -4,6 +4,7 @@ import colors from 'shared/styles/colors';
 import { useStore } from 'shared/hooks';
 import { observer } from 'mobx-react';
 import StatsTable from './StatsTable';
+import ShowMore from './ShowMore';
 import { StatsWrapper } from './styles';
 import { FormattedMessage } from 'react-intl.macro';
 
@@ -29,6 +30,7 @@ const GlobalStats: React.FC = () => {
       <div>
         {store.globalStats ? <StatsTable keyColor={colors.secondary} data={store.globalStats} /> : null}
       </div>
+      <ShowMore /> 
     </StatsWrapper>
   );
 };
