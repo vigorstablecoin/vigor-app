@@ -4,9 +4,6 @@ import { useStore } from 'shared/hooks';
 import styled, { createGlobalStyle } from 'styled-components';
 import colors from 'shared/styles/colors';
 import LedgerModal from './LedgerModal';
-import { exhaustiveCheck } from 'shared/typings';
-import { ModalTypes } from '../typings';
-import TokenModal from './TokenModal';
 
 const GlobalBodyNoScrollStyle = createGlobalStyle`
   body {
@@ -31,23 +28,18 @@ const ModalsContainer: React.FC<{}> = () => {
 
     if (modalStore.modals.length === 0) return null;
 
-    const getModalComponent = (type: ModalTypes) => {
-        switch (type) {
-            case 'LEDGER':
-                return LedgerModal;
-            case 'TOKEN':
-                return TokenModal;
-            default:
-                exhaustiveCheck(type)
-        }
-    }
-
     return (
         <Section id="modals">
             <GlobalBodyNoScrollStyle />
             {modalStore.modals.map(modal => {
-                const ModalComponent = getModalComponent(modal.type)!;
-                
+                let ModalComponent;
+                switch (modal.type) {
+                    case 'LEDGER':
+                        ModalComponent = LedgerModal;
+                        break;
+                    default:
+                        ModalComponent = null;
+                }
                 return (
                     <ModalComponent
                         key={modal.type}

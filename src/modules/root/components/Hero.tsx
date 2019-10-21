@@ -7,12 +7,11 @@ import { Section } from 'shared/components/styled';
 import heroBg from 'shared/assets/hero-bg.svg';
 import { NAVBAR_HEIGHT } from './NavBar';
 
-const HeroWrapper = styled.div`
+const HeroWrapper = styled(Section)`
+    padding: ${NAVBAR_HEIGHT + 16}px 0 48px 0;
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 100%;
-    padding: ${NAVBAR_HEIGHT + 16}px 0 48px 0;
     background-color: ${colors.bg};
     background: radial-gradient(
             ellipse farthest-corner at center center,

@@ -6,6 +6,7 @@ const GlobalStyles = createGlobalStyle`
 body {
   padding: 0;
   margin: 0;
+  font-family: "Source Sans Pro", sans-serif;
   font-size: 16px;
   font-weight: 600;
   color: ${colors.white};
@@ -31,8 +32,8 @@ p {
   margin: 0;
 }
 
-body, * {
-  font-family: Lato, sans-serif;
+* {
+  font-family: Montserrat, sans-serif;
   box-sizing: border-box;
 }
 `;
