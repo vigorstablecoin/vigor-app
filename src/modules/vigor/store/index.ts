@@ -1,63 +1,32 @@
 import { RpcError } from 'eosjs';
-import { action, computed, observable } from 'mobx';
+import { action, computed, observable, toJS } from 'mobx';
 import RootStore from 'modules/root/store';
 import { getContracts } from 'shared/eos/networks';
 import { fetchRows } from 'shared/eos/utils';
-import { TUserRow, TGlobalsRow } from 'shared/typings';
+import { TUserRow, TGlobalsRow, TCoinstatRow, TExtendedSymbol, TAsset } from 'shared/typings';
+import { decomposeAsset } from 'shared/eos/asset';
+import User from './User';
 
 export default class VigorStore {
     rootStore: RootStore;
+    user: User;
 
     constructor(rootStore: RootStore) {
         this.rootStore = rootStore;
+        this.user = new User(this)
     }
 
-    @observable displayAccountName = ``
-    @observable userStats?:TUserRow;
-    @observable globalStats?:TGlobalsRow;
-    @observable isFetching = false;
-    @observable lastFetchedAccountName = ``;
-    @observable isUserFetchDirty = false;
+    @observable globalStats?: TGlobalsRow;
+    @observable availableTokens: TExtendedSymbol[] = [];
+
+   
+    @action init() {
+        return Promise.all([this.fetchAvailableTokens(), 
+            this.fetchGlobalStats()])
+    }
 
     @action onLogin() {
-        if (!this.displayAccountName) {
-            this.displayAccountName = this.rootStore.accountStore.accountName;
-            this.fetchUserStats()
-            this.fetchGlobalStats()
-        }
-    }
-
-    @action handleDisplayAccountNameChange = (event) => {
-        this.displayAccountName = event.target.value;
-    }
-
-    @action async fetchUserStats() {
-        if(!this.displayAccountName) return;
-
-        this.lastFetchedAccountName = this.displayAccountName
-        const contracts = getContracts()
-
-        try {
-            this.isFetching = true;
-            const rows = await fetchRows<TUserRow>({
-                code: contracts.vigor,
-                scope: contracts.vigor,
-                table: `user`,
-                key_type: `name`,
-                lower_bound: this.lastFetchedAccountName,
-                upper_bound: this.lastFetchedAccountName,
-                limit: 1
-            })
-
-            this.userStats = rows[0];
-            console.log(this.userStats)
-        } catch (err) {
-            console.error(err)
-        }
-        finally {
-            this.isUserFetchDirty = true;
-            this.isFetching = false;
-        }
+        this.user.onLogin()
     }
 
     @action async fetchGlobalStats() {
@@ -72,7 +41,39 @@ export default class VigorStore {
 
             const globalStats = rows[0];
             if (globalStats) this.globalStats = globalStats
-            console.log(globalStats)
+        } catch (err) {
+            console.error(err)
+        }
+    }
+
+    @action async fetchAvailableTokens() {
+        const contracts = getContracts()
+        try {
+            const coinstatResult = await fetchRows<TCoinstatRow>({
+                json: true,
+                code: contracts.vigor,
+                scope: contracts.vigor,
+                table: `coinstat`,
+                lower_bound: 0
+            });
+
+            const availableTokens = coinstatResult.map(row => {
+                // reconstruct token from supply. assume issuer is also where the token is deployed
+                const [amount, symbolCode] = row.supply.split(` `);
+                const precision = amount.length - 1 - amount.indexOf(`.`);
+
+                return {
+                    contract: row.issuer,
+                    symbol: {
+                        code: symbolCode,
+                        precision
+                    }
+                };
+            })
+                // make vigor token not available for backing
+                .filter(({ symbol: { code } }) => code !== `VIGOR`);
+
+            this.availableTokens = availableTokens;
         } catch (err) {
             console.error(err)
         }
