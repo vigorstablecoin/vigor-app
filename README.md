@@ -1,6 +1,9 @@
 [![Netlify Status](https://api.netlify.com/api/v1/badges/2235e531-ad29-4b4a-b306-9b9b9d3bac17/deploy-status)](https://app.netlify.com/sites/vig/deploys)
 
+
 # Vigor-App
+
+[vig.netlify.com/](https://vig.netlify.com/)
 
 This repo manages the standalone React frontend for the Vigor stablecoin app.
 (The frontend integrated into the eosDAC memberclient [can be found here]([https](https://github.com/vigorstablecoin/eosdac-client-extension)).)
