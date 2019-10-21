@@ -31,6 +31,10 @@ export default class AccountStore {
         return Boolean(this.accountInfo);
     }
 
+    @computed get accountName() {
+        return this.accountInfo ? String(this.accountInfo.account_name) : ``
+    }
+
     @action login = async (walletName: WALLETS) => {
         if (this.isLoggingIn) return;
 
@@ -68,6 +72,7 @@ export default class AccountStore {
 
             setLoginStatusToStorage('true');
             setWalletProviderToStorage(walletName);
+            this.rootStore.vigorStore.onLogin()
         } catch (err) {
             console.error(err);
             setLoginStatusToStorage('false');

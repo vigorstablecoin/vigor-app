@@ -38,7 +38,7 @@ export default class ModalStore {
                 },
                 onCancel: () => {
                     this.modals.replace(this.modals.filter(({ id }) => id !== nextId));
-                    resolve({ canceled: false });
+                    resolve({ canceled: true });
                 },
                 additionalProps,
                 type,

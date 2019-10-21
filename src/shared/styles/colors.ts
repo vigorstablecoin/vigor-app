@@ -1,5 +1,6 @@
 import { lighten, darken } from 'polished';
 
+const white = `#ffffff`
 const bg = `#13161f`;
 const primary = `#2fe7f3`;
 const secondary = `#9100E7`; // unused for now, feel free to change
@@ -10,7 +11,10 @@ const colors = {
     bgLight: lighten(0.05, bg),
     bgLighter: lighten(0.1, bg),
     bgLightest: lighten(0.15, bg),
-    white: `#fff`,
+    white,
+    whiteDark: darken(0.05, white),
+    whiteDarker: darken(0.1, white),
+    whiteDarkest: darken(0.15, white),
     primary,
     primaryDark: darken(0.05, primary),
     primaryDarker: darken(0.1, primary),
