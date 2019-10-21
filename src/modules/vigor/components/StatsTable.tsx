@@ -46,7 +46,7 @@ const formatValue = (val) => {
 
 const StatsTable: React.FC<{ data: any, keyColor?: string, tableRowDepth?: number }> = ({ data, keyColor = colors.primary, tableRowDepth = 0 }) => {
   if (typeof data === `object` && !Array.isArray(data)) {
-    const rows = Object.entries(data).map(([key, val]) => <TableRow depth={tableRowDepth} key={key}>
+    const rows = Object.entries(data).map(([key, val]) => <TableRow key={key} depth={tableRowDepth}>
       <TableKey color={keyColor}>{key}</TableKey>
       <StatsTable data={val} keyColor={keyColor} tableRowDepth={tableRowDepth + 1} />
     </TableRow>)
@@ -55,7 +55,7 @@ const StatsTable: React.FC<{ data: any, keyColor?: string, tableRowDepth?: numbe
 
   if (Array.isArray(data)) {
     return <VerticalFlex alignItems="flex-end">
-      {data.map(val => <TableRow depth={tableRowDepth}><StatsTable data={val} tableRowDepth={tableRowDepth + 1} /></TableRow>)}
+      {data.map((val, index) => <TableRow key={index} depth={tableRowDepth}><StatsTable data={val} tableRowDepth={tableRowDepth + 1} /></TableRow>)}
     </VerticalFlex>
   }
 

@@ -1,1 +1,2 @@
-export type ModalTypes = `LEDGER`;
+export type ModalTypes = `LEDGER` | `TOKEN`;
+export type TokenModalTypes = `DEPOSIT` | `WITHDRAW`
