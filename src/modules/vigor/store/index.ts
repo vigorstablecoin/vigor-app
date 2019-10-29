@@ -72,7 +72,6 @@ export default class VigorStore {
 
             const globalStats = rows[0];
             if (globalStats) this.globalStats = globalStats
-            console.log(globalStats)
         } catch (err) {
             console.error(err)
         }
