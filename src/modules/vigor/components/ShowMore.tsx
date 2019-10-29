@@ -25,11 +25,23 @@ const ShowMoreButton = styled.button`
     background-color: ${colors.bgLightest}
   }
 `
+const ShowMore: React.FC <{ onToggle: any }> = ({ onToggle }) => {
+    const [ toggle, setToggle ] = React.useState( false );
 
-const ShowMore: React.FC = () => {
+    const updateToggleAdvanced = () => {
+      setToggle( !toggle );
+      onToggle();
+    };
+
     return (
       <Wrapper alignItems="flex-start" responsiveAlignItems="center">
-        <ShowMoreButton>Advanced Health info</ShowMoreButton>
+        <ShowMoreButton onClick={ updateToggleAdvanced }>
+        {toggle === true ? (
+          <span>Show less</span>
+        ) : (
+          <span>Advanced Health info</span>  
+        )}
+        </ShowMoreButton>
       </Wrapper>
     );
 };
