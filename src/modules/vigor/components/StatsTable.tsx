@@ -44,7 +44,7 @@ const formatValue = (val) => {
   return val;
 }
 
-const StatsTable: React.FC<{ data: any, keyColor?: string, tableRowDepth?: number }> = ({ data, keyColor = colors.primary, tableRowDepth = 0 }) => {
+const StatsTable: React.FC<{ data: any, showMinimal?: boolean,  keyColor?: string, tableRowDepth?: number }> = ({ data, showMinimal, keyColor = colors.primary, tableRowDepth = 0 }) => {
   if (typeof data === `object` && !Array.isArray(data)) {
     const rows = Object.entries(data).map(([key, val]) => <TableRow depth={tableRowDepth} key={key}>
       <TableKey color={keyColor}>{key}</TableKey>
@@ -53,9 +53,17 @@ const StatsTable: React.FC<{ data: any, keyColor?: string, tableRowDepth?: numbe
     return <React.Fragment>{rows}</React.Fragment>
   }
 
+  if (Array.isArray(data) && showMinimal) {
+    const rows = data.map(([key, val]) => <TableRow depth={tableRowDepth} key={key}>
+      <TableKey color={keyColor}>{key}</TableKey>
+      <StatsTable data={val} keyColor={keyColor} tableRowDepth={tableRowDepth + 1} />
+    </TableRow>)
+    return <React.Fragment>{rows}</React.Fragment>
+  }
+
   if (Array.isArray(data)) {
     return <VerticalFlex alignItems="flex-end">
-      {data.map(val => <TableRow depth={tableRowDepth}><StatsTable data={val} tableRowDepth={tableRowDepth + 1} /></TableRow>)}
+      {data.map(val => <TableRow key={val} depth={tableRowDepth}><StatsTable data={val} tableRowDepth={tableRowDepth + 1} /></TableRow>)}
     </VerticalFlex>
   }
 
