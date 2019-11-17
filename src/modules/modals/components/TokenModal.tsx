@@ -121,6 +121,10 @@ const TokenModal: React.FC<Props> = ({ onSubmit, onCancel, type, token, maxAmoun
                 return <FormattedMessage id="modalDepositTitle" defaultMessage="Deposit {symbol}" values={{ symbol: token.symbol.code }} />
             case `WITHDRAW`:
                 return <FormattedMessage id="modalWithdrawTitle" defaultMessage="Withdraw {symbol}" values={{ symbol: token.symbol.code }} />
+            case `BORROW`:
+                return <FormattedMessage id="modalBorrowTitle" defaultMessage="Borrow {symbol}" values={{ symbol: token.symbol.code }} />
+            case `PAYOFFDEBT`:
+                return <FormattedMessage id="modalPayoffDebtTitle" defaultMessage="Payoff debt {symbol}" values={{ symbol: token.symbol.code }} />
         }
     }
 
@@ -130,6 +134,10 @@ const TokenModal: React.FC<Props> = ({ onSubmit, onCancel, type, token, maxAmoun
                 return <FormattedMessage id="modalDepositButton" defaultMessage="Deposit" />
             case `WITHDRAW`:
                 return <FormattedMessage id="modalWithdrawButton" defaultMessage="Withdraw" />
+            case `BORROW`:
+                return <FormattedMessage id="modalBorrowButton" defaultMessage="Borrow" />
+            case `PAYOFFDEBT`:
+                return <FormattedMessage id="modalPayoffDebtButton" defaultMessage="Payoff Debt" />
         }
     }
 

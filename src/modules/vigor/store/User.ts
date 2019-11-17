@@ -2,7 +2,7 @@ import { action, computed, observable } from 'mobx';
 import { getContracts } from 'shared/eos/networks';
 import { fetchRows } from 'shared/eos/utils';
 import { TUserRow, TAsset, TAccountsRow, TExtendedSymbol } from 'shared/typings';
-import { decomposeAsset } from 'shared/eos/asset';
+import { decomposeAsset, formatAsset } from 'shared/eos/asset';
 import VigorStore from "./index";
 import { PromiseAllSettledFilterFulfilled, PromiseAllSettled } from 'shared/utils/promise';
 
@@ -46,13 +46,20 @@ class User {
     }
   }
 
+  @computed get userBorrowStats() {
+    if (!this.userStats) return null;
+
+    return {
+      debt: this.userStats.debt,
+      creditscore: this.userStats.creditscore,
+    }
+  }
+
   @computed get userExtendedStats() {
     if (!this.userStats) return null;
 
     return {
       // usern: this.userStats.usern,
-      debt: this.userStats.debt,
-      creditscore: this.userStats.creditscore,
       feespaid: this.userStats.feespaid,
       lastupdate: this.userStats.lastupdate,
       latepays: this.userStats.latepays,
@@ -66,9 +73,9 @@ class User {
     this.displayAccountName = event.target.value;
   }
 
-  getTokenBalance = (token: TExtendedSymbol):number => {
-    const foundBalance = this.userBalances.find((asset) => asset.symbol.code === token.symbol.code)
-    return foundBalance ? foundBalance.amount : 0
+  getToken = (tokenSymbolCode: string):TAsset => {
+    const foundBalance = this.userBalances.find((asset) => asset.symbol.code === tokenSymbolCode)
+    return foundBalance ? foundBalance : { amount: 0, symbol: { code: tokenSymbolCode, precision: 4 }}
   }
 
   @action async fetchUser() {
@@ -117,7 +124,7 @@ class User {
     try {
       const availableTokens = this.vigorStore.availableTokens
       this.isFetching = true;
-      const accountsRows = await PromiseAllSettledFilterFulfilled(
+      const accountsRows = await PromiseAllSettled(
         availableTokens.map(token => fetchRows<TAccountsRow>({
           code: token.contract,
           scope: this.displayAccountName,
@@ -126,8 +133,11 @@ class User {
         })))
 
         
-        this.userBalances = accountsRows.map(rows => rows[0]).filter(row => Boolean(row))
-        .map(row => decomposeAsset(row.balance))
+        this.userBalances = accountsRows.map((rows, index) => {
+          if(rows[0]) return rows[0]
+          return formatAsset({ amount: 0, symbol: availableTokens[index].symbol })
+        })
+        .map(asset => decomposeAsset(asset))
     } catch (err) {
       console.error(err)
       throw err;
