@@ -7,6 +7,15 @@ import { TUserRow, TGlobalsRow, TCoinstatRow, TExtendedSymbol, TAsset } from 'sh
 import { decomposeAsset } from 'shared/eos/asset';
 import User from './User';
 
+
+const vigorAsset = {
+    contract: getContracts().vigor,
+    symbol: {
+        code: `VIGOR`,
+        precision: 4
+    },
+};
+
 export default class VigorStore {
     rootStore: RootStore;
     user: User;
@@ -19,10 +28,10 @@ export default class VigorStore {
     @observable globalStats?: TGlobalsRow;
     @observable availableTokens: TExtendedSymbol[] = [];
 
-   
+
     @action init() {
-        return Promise.all([this.fetchAvailableTokens(), 
-            this.fetchGlobalStats()])
+        return Promise.all([this.fetchAvailableTokens(),
+        this.fetchGlobalStats()])
     }
 
     @action onLogin() {
@@ -70,12 +79,19 @@ export default class VigorStore {
                     }
                 };
             })
-                // make vigor token not available for backing
-                .filter(({ symbol: { code } }) => code !== `VIGOR`);
 
-            this.availableTokens = availableTokens;
+            this.availableTokens = availableTokens
         } catch (err) {
             console.error(err)
         }
     }
+
+
+  @computed get availableTokensToInsure() {
+    return this.availableTokens.filter(token => token.symbol.code !== vigorAsset.symbol.code)
+  }
+
+  @computed get availableTokensToBorrow() {
+    return this.availableTokens.filter(token => token.symbol.code === vigorAsset.symbol.code)
+  }
 }

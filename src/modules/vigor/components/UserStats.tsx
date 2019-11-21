@@ -81,7 +81,7 @@ const StatsBlockHeader = styled.h3`
   color: ${colors.primary};
 `
 
-const DepositWithdrawTokenRow = styled.div`
+const TokenButtonRow = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -132,7 +132,7 @@ const UserStats: React.FC = () => {
     const found = userCommitts.find(({ symbol }) => symbol.code === token.symbol.code)
     const commitVal = found ? found.amount : 0
     const commitFormatted = formatAsset({ amount: commitVal, symbol: token.symbol })
-    const userBalanceVal = userStore.getTokenBalance(token)
+    const userBalanceVal = userStore.getToken(token.symbol.code).amount
 
     const handleTokenClick = (type: TokenModalTypes) => async () => {
       const maxAmount = type === `DEPOSIT` ? userBalanceVal : commitVal
@@ -142,7 +142,6 @@ const UserStats: React.FC = () => {
 
       const quantity = data!
 
-      console.log(`handleTokenClick`, quantity)
       if (isCollateral && type === `DEPOSIT`) {
         return transactionStore.depositCollateral({ quantity })
       } else if (isCollateral && type === `WITHDRAW`) {
@@ -154,11 +153,39 @@ const UserStats: React.FC = () => {
       }
     }
 
-    return <DepositWithdrawTokenRow key={token.contract}>
+    return <TokenButtonRow key={token.contract}>
       <Padding>{commitFormatted}</Padding>
       <Padding hide={commitVal === 0}>{<StyledButton type="button" onClick={handleTokenClick(`WITHDRAW`)}><FormattedMessage id="withdraw" defaultMessage="Withdraw" /></StyledButton>}</Padding>
       <Padding hide={userBalanceVal === 0}>{<StyledButton type="button" onClick={handleTokenClick(`DEPOSIT`)}><FormattedMessage id="deposit" defaultMessage="Deposit" /></StyledButton>}</Padding>
-    </DepositWithdrawTokenRow>
+    </TokenButtonRow>
+  }
+
+  const renderBorrowPayOffRow = (token: TExtendedSymbol) => {
+    const userBalance = userStore.getToken(token.symbol.code)
+    const userDebtFormatted = userStore.userBorrowStats!.debt
+    const userDebtVal = decomposeAsset(userDebtFormatted).amount
+
+    const handleTokenClick = (type: TokenModalTypes) => async () => {
+      // TODO: compute max amount we can borrow here
+      const maxAmount = type === `BORROW` ? 1e9 : userDebtVal
+      const { data, canceled } = await modalStore.showModal<TAsset>(`TOKEN`, { type, token, maxAmount });
+
+      if (canceled) return;
+
+      const quantity = data!
+
+      if (type === `BORROW`) {
+        return transactionStore.borrow({ quantity })
+      } else if (type === `PAYOFFDEBT`) {
+        return transactionStore.payoff({ quantity })
+      }
+    }
+
+    return <TokenButtonRow key={token.contract}>
+      <Padding>{formatAsset(userBalance)}</Padding>
+      <Padding>{<StyledButton type="button" onClick={handleTokenClick(`BORROW`)}><FormattedMessage id="borrow" defaultMessage="Borrow" /></StyledButton>}</Padding>
+      <Padding hide={userDebtVal === 0}>{<StyledButton type="button" onClick={handleTokenClick(`PAYOFFDEBT`)}><FormattedMessage id="payoffdebt" defaultMessage="Payoff" /></StyledButton>}</Padding>
+    </TokenButtonRow>
   }
 
   const renderContent = () => {
@@ -166,7 +193,7 @@ const UserStats: React.FC = () => {
       <StatsBlockHeader><FormattedMessage id="collateral" defaultMessage="Collateral" /></StatsBlockHeader>
       <div>
         {
-          vigorStore.availableTokens.map(token => renderDepositWithdrawRow(token, true))
+          vigorStore.availableTokensToInsure.map(token => renderDepositWithdrawRow(token, true))
         }
       </div>
       <StatsTable data={omit(userStore.userCollateral, `collateral`)} />
@@ -176,10 +203,20 @@ const UserStats: React.FC = () => {
       <StatsBlockHeader><FormattedMessage id="insurance" defaultMessage="Insurance" /></StatsBlockHeader>
       <div>
         {
-          vigorStore.availableTokens.map(token => renderDepositWithdrawRow(token, false))
+          vigorStore.availableTokensToInsure.map(token => renderDepositWithdrawRow(token, false))
         }
       </div>
       <StatsTable data={omit(userStore.userInsurance, `insurance`)} />
+    </StatsBlock>
+
+    const Borrow = <StatsBlock>
+      <StatsBlockHeader><FormattedMessage id="borrow" defaultMessage="Borrow" /></StatsBlockHeader>
+      <div>
+        {
+          vigorStore.availableTokensToBorrow.map(token => renderBorrowPayOffRow(token))
+        }
+      </div>
+      <StatsTable data={omit(userStore.userBorrowStats)} />
     </StatsBlock>
 
     const Extended = <StatsBlock>
@@ -190,6 +227,7 @@ const UserStats: React.FC = () => {
     return <React.Fragment>
       {Collateral}
       {Insurance}
+      {Borrow}
       {Extended}
     </React.Fragment>
   }

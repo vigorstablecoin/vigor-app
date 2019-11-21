@@ -106,4 +106,38 @@ export default class TransactionStore {
             this.rootStore.vigorStore.fetchGlobalStats(),
         ])
     }
+
+    @action borrow = async ({quantity}: { quantity: TAsset }) => {
+        if(!await this.checkLogin()) return;
+        await this.sendTransaction({
+            name: `assetout`,
+            data: {
+                usern: this.walletAccount,
+                assetout: formatAsset(quantity),
+                memo: `borrow`,
+            }
+        })
+        await PromiseAllSettled<any>([
+            this.rootStore.vigorStore.user.fetchUser(),
+            this.rootStore.vigorStore.fetchGlobalStats(),
+        ])
+    }
+
+    @action payoff = async ({quantity}: { quantity: TAsset }) => {
+        if(!await this.checkLogin()) return;
+        await this.sendTransaction({
+            account: getContracts().systemToken,
+            name: `transfer`,
+            data: {
+                from: this.walletAccount,
+                to: getContracts().vigor,
+                quantity: formatAsset(quantity),
+                memo: `payoff debt`,
+            }
+        })
+        await PromiseAllSettled<any>([
+            this.rootStore.vigorStore.user.fetchUser(),
+            this.rootStore.vigorStore.fetchGlobalStats(),
+        ])
+    }
 }
